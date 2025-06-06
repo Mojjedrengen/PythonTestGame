@@ -23,7 +23,7 @@ class MainController(arcade.Window):
         self.bullet_list.draw()
 
     def on_update(self, delta_time):
-        self.player.on_update(self.bullet_list)
+        self.player.on_update(self.bullet_list, delta_time)
         self.bullet_list.update()
     
     def on_key_press(self, key, modifiers):

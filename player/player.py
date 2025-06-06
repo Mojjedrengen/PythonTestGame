@@ -12,14 +12,20 @@ class Player:
         self.changeY = 0
         self.dirX = 0
         self.dirY = 0
+        self.attack_speed : float = 10 # Frequence
+        self.delta_shoot_time = 0
 
     def draw(self):
         #arcade.draw_lrbt_rectangle_filled(self.x, self.x+self.size, self.y, self.y+self.size, arcade.csscolor.BROWN)
         arcade.draw_lbwh_rectangle_filled(self.x, self.y, self.size, self.size, arcade.csscolor.RED)
 
-    def on_update(self, bullet_list):
+    def on_update(self, bullet_list, delta_time):
         self.__move()
-        self.__shoot(bullet_list)
+        as_time = 1 / self.attack_speed
+        self.delta_shoot_time += delta_time
+        if self.delta_shoot_time > as_time and not (self.dirX == 0 and self.dirY == 0):
+            self.__shoot(bullet_list)
+            self.delta_shoot_time = 0
 
     def __move(self):
         length = math.sqrt(math.pow(self.changeX, 2) + math.pow(self.changeY, 2))
