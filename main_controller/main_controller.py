@@ -9,18 +9,26 @@ class MainController(arcade.Window):
         self.set_mouse_visible(False)
 
         arcade.set_background_color(arcade.color.ASH_GREY)
-
-        self.player = Player(10, 100, 100)
-        
+ 
+        self.player_list = None
         self.bullet_list = None
+        self.player = None
+        self.player_collider = None
 
     def setup(self):
+        texture = arcade.make_soft_square_texture(50, arcade.csscolor.RED, 255, 90)
+        self.player_collider = arcade.Sprite()
+        self.player_collider.scale = 0.4
         self.bullet_list = arcade.SpriteList()
+        self.player = Player(10, 100, 100, self.player_collider)
+        self.player_list = arcade.SpriteList()
+        self.player_list.append(self.player_collider)
 
     def on_draw(self):
         self.clear()
-        self.player.draw()
         self.bullet_list.draw()
+        self.player_list.draw()
+        self.player.draw()
 
     def on_update(self, delta_time):
         self.player.on_update(self.bullet_list, delta_time)
