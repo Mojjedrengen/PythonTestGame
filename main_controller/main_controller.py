@@ -1,6 +1,9 @@
 import arcade
 from arcade.sprite_list import SpriteList
+from arcade.texture import Texture
 from player import Player
+
+import random
 
 class MainController(arcade.Window):
     def __init__(self, width, height, title):
@@ -9,31 +12,65 @@ class MainController(arcade.Window):
         self.set_mouse_visible(False)
 
         arcade.set_background_color(arcade.color.ASH_GREY)
- 
+        
+        self.height = height
+        self.width = width
+        
         self.player_list = None
         self.bullet_list = None
         self.player = None
         self.player_collider = None
+        self.enemy_list = None
+
+        self.score = 0
+        self.enemy_frequency = 1
+        self.enemy_time_counter = 0
 
     def setup(self):
         texture = arcade.make_soft_square_texture(50, arcade.csscolor.RED, 255, 90)
         self.player_collider = arcade.Sprite()
         self.player_collider.scale = 0.4
         self.bullet_list = arcade.SpriteList()
-        self.player = Player(10, 100, 100, self.player_collider)
+        self.player = Player(200, 100, 100, self.player_collider)
         self.player_list = arcade.SpriteList()
         self.player_list.append(self.player_collider)
-        print("Test Branch")
+        self.enemy_list = arcade.SpriteList()
 
     def on_draw(self):
         self.clear()
         self.bullet_list.draw()
         self.player_list.draw()
         self.player.draw()
+        self.enemy_list.draw()
 
     def on_update(self, delta_time):
         self.player.on_update(self.bullet_list, delta_time)
         self.bullet_list.update()
+        self.enemy_list.update()
+        t = 1 / self.enemy_frequency
+        self.enemy_time_counter += delta_time
+        if self.enemy_time_counter >= t:
+            self.enemy_time_counter = 0
+            texture = arcade.make_soft_square_texture(50, arcade.csscolor.BLACK, 255, 255)
+            enemy = arcade.Sprite(texture)
+            enemy.change_x = 0 
+            enemy.change_y = -5
+            enemy.center_y = self.height - 50
+            enemy.center_x = random.randint(50, self.width-50)
+            self.enemy_list.append(enemy)
+
+        for bullet in self.bullet_list:
+            hit_list = arcade.check_for_collision_with_list(bullet, self.enemy_list)
+            if len(hit_list) > 0:
+                bullet.remove_from_sprite_lists()
+
+            for enemy in hit_list:
+                enemy.remove_from_sprite_lists()
+                self.score += 1
+                print("score: ", self.score)
+
+            if bullet.center_y > self.height or bullet.center_y < 0 or bullet.center_x > self.width or bullet.center_x < 0:
+                bullet.remove_from_sprite_lists()
     
     def on_key_press(self, key, modifiers):
         if   key == arcade.key.A:

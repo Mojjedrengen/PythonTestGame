@@ -1,8 +1,5 @@
-from pathlib import Path
 import arcade
 import math
-
-from .bullet import Bullet
 
 class Player:
     def __init__(self, speed, x: float, y : float, collider : arcade.Sprite):
@@ -25,21 +22,21 @@ class Player:
         #arcade.draw_lbwh_rectangle_filled(self.center_x, self.center_y, self.size, self.size, arcade.csscolor.RED)
 
     def on_update(self, bullet_list, delta_time):
-        self.__move()
+        self.__move(delta_time)
         as_time = 1 / self.attack_speed
         self.delta_shoot_time += delta_time
         if self.delta_shoot_time > as_time and not (self.dirX == 0 and self.dirY == 0):
             self.__shoot(bullet_list)
             self.delta_shoot_time = 0
 
-    def __move(self):
+    def __move(self, delta_time):
         length = math.sqrt(math.pow(self.changeX, 2) + math.pow(self.changeY, 2))
         if length == 0:
             return
         moveX = self.changeX / length
         moveY = self.changeY / length
-        self.center_x = self.center_x + moveX * self.speed
-        self.center_y = self.center_y + moveY * self.speed
+        self.center_x = self.center_x + moveX * self.speed * delta_time
+        self.center_y = self.center_y + moveY * self.speed * delta_time
         self.collider.center_x = self.center_x
         self.collider.center_y = self.center_y
 
