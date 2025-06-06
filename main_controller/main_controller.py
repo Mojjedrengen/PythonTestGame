@@ -23,6 +23,7 @@ class MainController(arcade.Window):
         self.player = Player(10, 100, 100, self.player_collider)
         self.player_list = arcade.SpriteList()
         self.player_list.append(self.player_collider)
+        print("Test Branch")
 
     def on_draw(self):
         self.clear()
