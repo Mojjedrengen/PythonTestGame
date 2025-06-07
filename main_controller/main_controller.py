@@ -1,3 +1,4 @@
+from PIL import Image
 import arcade
 from arcade.sprite_list import SpriteList
 from arcade.texture import Texture
@@ -27,9 +28,10 @@ class MainController(arcade.Window):
         self.enemy_time_counter = 0
 
     def setup(self):
-        texture = arcade.make_soft_square_texture(50, arcade.csscolor.RED, 255, 90)
-        self.player_collider = arcade.Sprite()
-        self.player_collider.scale = 0.4
+        img = Image.open("data/PlayerYes.png")
+        texture = arcade.Texture(img)
+        self.player_collider = arcade.Sprite(texture)
+        self.player_collider.scale = 1
         self.bullet_list = arcade.SpriteList()
         self.player = Player(200, 100, 100, self.player_collider)
         self.player_list = arcade.SpriteList()
@@ -39,8 +41,8 @@ class MainController(arcade.Window):
     def on_draw(self):
         self.clear()
         self.bullet_list.draw()
-        self.player_list.draw()
         self.player.draw()
+        self.player_list.draw()
         self.enemy_list.draw()
 
     def on_update(self, delta_time):
@@ -71,6 +73,18 @@ class MainController(arcade.Window):
 
             if bullet.center_y > self.height or bullet.center_y < 0 or bullet.center_x > self.width or bullet.center_x < 0:
                 bullet.remove_from_sprite_lists()
+
+        for player in self.player_list:
+            player.draw_hit_box(arcade.csscolor.BLACK, 2)
+            if player.center_y > self.height:
+                self.player.boundsY(-1)
+            elif player.center_y < 0:
+                self.player.boundsY(1)
+            elif player.center_x > self.width:
+                self.player.boundsX(-1)
+            elif player.center_x < 0:
+                self.player.boundsX(1)
+
     
     def on_key_press(self, key, modifiers):
         if   key == arcade.key.A:

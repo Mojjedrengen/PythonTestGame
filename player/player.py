@@ -3,7 +3,7 @@ import math
 
 class Player:
     def __init__(self, speed, x: float, y : float, collider : arcade.Sprite):
-        self.size = 50
+        self.size = 3.5
         self.speed = speed
         self.center_x = x
         self.center_y = y
@@ -14,14 +14,18 @@ class Player:
         self.attack_speed : float = 10 # Frequence
         self.delta_shoot_time = 0
         self.collider = collider
+        self.collider.scale = self.size
+        self.health_points = 3
 
     def draw(self):
         x = self.center_x - self.size / 2
         y = self.center_y - self.size / 2
         arcade.draw_lrbt_rectangle_filled(x, x+self.size, y, y+self.size, arcade.csscolor.BROWN)
+        self.collider.draw_hit_box(arcade.csscolor.RED, 2)
         #arcade.draw_lbwh_rectangle_filled(self.center_x, self.center_y, self.size, self.size, arcade.csscolor.RED)
 
     def on_update(self, bullet_list, delta_time):
+        self.lastDeltaTime = delta_time
         self.__move(delta_time)
         as_time = 1 / self.attack_speed
         self.delta_shoot_time += delta_time
@@ -50,6 +54,22 @@ class Player:
         if (changeY > 1 or changeY < -1):
             return
         self.changeY = changeY
+
+    def boundsX(self, changeX : int):
+        if (changeX > 1 or changeX < -1):
+            return
+        tempCX = self.changeX
+        self.changeX = changeX
+        self.__move(self.lastDeltaTime)
+        self.changeX = tempCX
+    
+    def boundsY(self, changeY : int):
+        if (changeY > 1 or changeY < -1):
+            return
+        tempCY = self.changeY
+        self.changeY = changeY
+        self.__move(self.lastDeltaTime)
+        self.changeY = tempCY
 
     def shootY(self, dirY : int): 
         if (dirY > 1 or dirY < -1):
@@ -81,3 +101,10 @@ class Player:
         bullet.center_x = self.center_x
         bullet.center_y = self.center_y
         bullet_list.append(bullet)
+
+    def is_hit(self) -> bool:
+        self.health_points -= 1
+        if self.health_points <= 0:
+            return True
+        else:
+            return False
